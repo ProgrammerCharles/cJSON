@@ -179,6 +179,7 @@ static void * CJSON_CDECL internal_realloc(void *pointer, size_t size)
 /* strlen of character literals resolved at compile time */
 #define static_strlen(string_literal) (sizeof(string_literal) - sizeof(""))
 
+/** 方法 */
 static internal_hooks global_hooks = { internal_malloc, internal_free, internal_realloc };
 
 static unsigned char* cJSON_strdup(const unsigned char* string, const internal_hooks * const hooks)
@@ -191,7 +192,10 @@ static unsigned char* cJSON_strdup(const unsigned char* string, const internal_h
         return NULL;
     }
 
+    //sizeof("") == 1
     length = strlen((const char*)string) + sizeof("");
+//    printf("%s len: const char* len %lu\n",string, strlen((const char*)string));
+    //realloc
     copy = (unsigned char*)hooks->allocate(length);
     if (copy == NULL)
     {
@@ -2028,6 +2032,7 @@ static cJSON_bool add_item_to_object(cJSON * const object, const char * const st
     }
     else
     {
+        //一个指向 只读变量 的指针  string means a pointer to  const unsigned char
         new_key = (char*)cJSON_strdup((const unsigned char*)string, hooks);
         if (new_key == NULL)
         {
@@ -2037,8 +2042,10 @@ static cJSON_bool add_item_to_object(cJSON * const object, const char * const st
         new_type = item->type & ~cJSON_StringIsConst;
     }
 
+    //todo ???
     if (!(item->type & cJSON_StringIsConst) && (item->string != NULL))
     {
+        //free
         hooks->deallocate(item->string);
     }
 
@@ -2048,6 +2055,7 @@ static cJSON_bool add_item_to_object(cJSON * const object, const char * const st
     return add_item_to_array(object, item);
 }
 
+/** 键值对 string - item */
 CJSON_PUBLIC(cJSON_bool) cJSON_AddItemToObject(cJSON *object, const char *string, cJSON *item)
 {
     return add_item_to_object(object, string, item, &global_hooks, false);
@@ -2457,6 +2465,8 @@ CJSON_PUBLIC(cJSON *) cJSON_CreateString(const char *string)
     {
         item->type = cJSON_String;
         item->valuestring = (char*)cJSON_strdup((const unsigned char*)string, &global_hooks);
+
+        //
         if(!item->valuestring)
         {
             cJSON_Delete(item);

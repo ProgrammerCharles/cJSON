@@ -102,6 +102,7 @@ then using the CJSON_API_VISIBILITY flag to "export" the same symbols the way CJ
 /* The cJSON structure: */
 typedef struct cJSON
 {
+    /** 双向链表 */
     /* next/prev allow you to walk array/object chains. Alternatively, use GetArraySize/GetArrayItem/GetObjectItem */
     struct cJSON *next;
     struct cJSON *prev;
@@ -118,6 +119,7 @@ typedef struct cJSON
     /* The item's number, if type==cJSON_Number */
     double valuedouble;
 
+    /** 键 */
     /* The item's name string, if this item is the child of, or is in the list of subitems of an object. */
     char *string;
 } cJSON;

@@ -111,13 +111,13 @@ static void create_objects(void)
     /* declare a few. */
     cJSON *root = NULL;
     cJSON *fmt = NULL;
-    cJSON *img = NULL;
-    cJSON *thm = NULL;
-    cJSON *fld = NULL;
-    int i = 0;
+    cJSON *img __attribute__((unused)) = NULL;
+    cJSON *thm __attribute__((unused)) = NULL;
+    cJSON *fld __attribute__((unused)) = NULL;
+    int i __attribute__((unused)) = 0;
 
     /* Our "days of the week" array: */
-    const char *strings[7] =
+    const char *strings[7] __attribute__((unused)) =
     {
         "Sunday",
         "Monday",
@@ -128,16 +128,16 @@ static void create_objects(void)
         "Saturday"
     };
     /* Our matrix: */
-    int numbers[3][3] =
+    int numbers[3][3] __attribute__((unused)) =
     {
         {0, -1, 0},
         {1, 0, 0},
         {0 ,0, 1}
     };
     /* Our "gallery" item: */
-    int ids[4] = { 116, 943, 234, 38793 };
+    int ids[4] __attribute__((unused)) = { 116, 943, 234, 38793 };
     /* Our array of "records": */
-    struct record fields[2] =
+    struct record fields[2]  __attribute__((unused)) =
     {
         {
             "zip",
@@ -160,11 +160,13 @@ static void create_objects(void)
             "US"
         }
     };
-    volatile double zero = 0.0;
+    volatile double __attribute__((unused)) zero = 0.0;
 
     /* Here we construct some JSON standards, from the JSON site. */
 
-    /* Our "Video" datatype: */
+    /* Our "Video" datatype: Video数据类型 */
+
+
     root = cJSON_CreateObject();
     cJSON_AddItemToObject(root, "name", cJSON_CreateString("Jack (\"Bee\") Nimble"));
     cJSON_AddItemToObject(root, "format", fmt = cJSON_CreateObject());
@@ -182,78 +184,78 @@ static void create_objects(void)
     cJSON_Delete(root);
 
     /* Our "days of the week" array: */
-    root = cJSON_CreateStringArray(strings, 7);
-
-    if (print_preallocated(root) != 0) {
-        cJSON_Delete(root);
-        exit(EXIT_FAILURE);
-    }
-    cJSON_Delete(root);
-
-    /* Our matrix: */
-    root = cJSON_CreateArray();
-    for (i = 0; i < 3; i++)
-    {
-        cJSON_AddItemToArray(root, cJSON_CreateIntArray(numbers[i], 3));
-    }
-
-    /* cJSON_ReplaceItemInArray(root, 1, cJSON_CreateString("Replacement")); */
-
-    if (print_preallocated(root) != 0) {
-        cJSON_Delete(root);
-        exit(EXIT_FAILURE);
-    }
-    cJSON_Delete(root);
-
-    /* Our "gallery" item: */
-    root = cJSON_CreateObject();
-    cJSON_AddItemToObject(root, "Image", img = cJSON_CreateObject());
-    cJSON_AddNumberToObject(img, "Width", 800);
-    cJSON_AddNumberToObject(img, "Height", 600);
-    cJSON_AddStringToObject(img, "Title", "View from 15th Floor");
-    cJSON_AddItemToObject(img, "Thumbnail", thm = cJSON_CreateObject());
-    cJSON_AddStringToObject(thm, "Url", "http:/*www.example.com/image/481989943");
-    cJSON_AddNumberToObject(thm, "Height", 125);
-    cJSON_AddStringToObject(thm, "Width", "100");
-    cJSON_AddItemToObject(img, "IDs", cJSON_CreateIntArray(ids, 4));
-
-    if (print_preallocated(root) != 0) {
-        cJSON_Delete(root);
-        exit(EXIT_FAILURE);
-    }
-    cJSON_Delete(root);
-
-    /* Our array of "records": */
-    root = cJSON_CreateArray();
-    for (i = 0; i < 2; i++)
-    {
-        cJSON_AddItemToArray(root, fld = cJSON_CreateObject());
-        cJSON_AddStringToObject(fld, "precision", fields[i].precision);
-        cJSON_AddNumberToObject(fld, "Latitude", fields[i].lat);
-        cJSON_AddNumberToObject(fld, "Longitude", fields[i].lon);
-        cJSON_AddStringToObject(fld, "Address", fields[i].address);
-        cJSON_AddStringToObject(fld, "City", fields[i].city);
-        cJSON_AddStringToObject(fld, "State", fields[i].state);
-        cJSON_AddStringToObject(fld, "Zip", fields[i].zip);
-        cJSON_AddStringToObject(fld, "Country", fields[i].country);
-    }
-
-    /* cJSON_ReplaceItemInObject(cJSON_GetArrayItem(root, 1), "City", cJSON_CreateIntArray(ids, 4)); */
-
-    if (print_preallocated(root) != 0) {
-        cJSON_Delete(root);
-        exit(EXIT_FAILURE);
-    }
-    cJSON_Delete(root);
-
-    root = cJSON_CreateObject();
-    cJSON_AddNumberToObject(root, "number", 1.0 / zero);
-
-    if (print_preallocated(root) != 0) {
-        cJSON_Delete(root);
-        exit(EXIT_FAILURE);
-    }
-    cJSON_Delete(root);
+//    root = cJSON_CreateStringArray(strings, 7);
+//
+//    if (print_preallocated(root) != 0) {
+//        cJSON_Delete(root);
+//        exit(EXIT_FAILURE);
+//    }
+//    cJSON_Delete(root);
+//
+//    /* Our matrix: */
+//    root = cJSON_CreateArray();
+//    for (i = 0; i < 3; i++)
+//    {
+//        cJSON_AddItemToArray(root, cJSON_CreateIntArray(numbers[i], 3));
+//    }
+//
+//    /* cJSON_ReplaceItemInArray(root, 1, cJSON_CreateString("Replacement")); */
+//
+//    if (print_preallocated(root) != 0) {
+//        cJSON_Delete(root);
+//        exit(EXIT_FAILURE);
+//    }
+//    cJSON_Delete(root);
+//
+//    /* Our "gallery" item: */
+//    root = cJSON_CreateObject();
+//    cJSON_AddItemToObject(root, "Image", img = cJSON_CreateObject());
+//    cJSON_AddNumberToObject(img, "Width", 800);
+//    cJSON_AddNumberToObject(img, "Height", 600);
+//    cJSON_AddStringToObject(img, "Title", "View from 15th Floor");
+//    cJSON_AddItemToObject(img, "Thumbnail", thm = cJSON_CreateObject());
+//    cJSON_AddStringToObject(thm, "Url", "http:/*www.example.com/image/481989943");
+//    cJSON_AddNumberToObject(thm, "Height", 125);
+//    cJSON_AddStringToObject(thm, "Width", "100");
+//    cJSON_AddItemToObject(img, "IDs", cJSON_CreateIntArray(ids, 4));
+//
+//    if (print_preallocated(root) != 0) {
+//        cJSON_Delete(root);
+//        exit(EXIT_FAILURE);
+//    }
+//    cJSON_Delete(root);
+//
+//    /* Our array of "records": */
+//    root = cJSON_CreateArray();
+//    for (i = 0; i < 2; i++)
+//    {
+//        cJSON_AddItemToArray(root, fld = cJSON_CreateObject());
+//        cJSON_AddStringToObject(fld, "precision", fields[i].precision);
+//        cJSON_AddNumberToObject(fld, "Latitude", fields[i].lat);
+//        cJSON_AddNumberToObject(fld, "Longitude", fields[i].lon);
+//        cJSON_AddStringToObject(fld, "Address", fields[i].address);
+//        cJSON_AddStringToObject(fld, "City", fields[i].city);
+//        cJSON_AddStringToObject(fld, "State", fields[i].state);
+//        cJSON_AddStringToObject(fld, "Zip", fields[i].zip);
+//        cJSON_AddStringToObject(fld, "Country", fields[i].country);
+//    }
+//
+//    /* cJSON_ReplaceItemInObject(cJSON_GetArrayItem(root, 1), "City", cJSON_CreateIntArray(ids, 4)); */
+//
+//    if (print_preallocated(root) != 0) {
+//        cJSON_Delete(root);
+//        exit(EXIT_FAILURE);
+//    }
+//    cJSON_Delete(root);
+//
+//    root = cJSON_CreateObject();
+//    cJSON_AddNumberToObject(root, "number", 1.0 / zero);
+//
+//    if (print_preallocated(root) != 0) {
+//        cJSON_Delete(root);
+//        exit(EXIT_FAILURE);
+//    }
+//    cJSON_Delete(root);
 }
 
 int CJSON_CDECL main(void)
