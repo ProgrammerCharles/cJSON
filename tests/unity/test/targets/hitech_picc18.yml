@@ -56,9 +56,9 @@ linker:
     - --cp=24 # 24-bit pointers. Is this needed for linker??
     - --double=24 # Is this needed for linker??
     - -Lw # Scan the pic87*w.lib in the lib/ of the compiler installation directory
-    - --summary=mem,file # info listing
-    - --summary=+psect
-    - --summary=+hex
+    - --summary.md=mem,file # info listing
+    - --summary.md=+psect
+    - --summary.md=+hex
     - --output=+intel
     - --output=+mcof
     - --runtime=+init # Directs startup code to copy idata, ibigdata and ifardata psects from ROM to RAM.

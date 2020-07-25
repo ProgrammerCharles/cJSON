@@ -151,6 +151,8 @@ static int case_insensitive_strcmp(const unsigned char *string1, const unsigned 
 
 typedef struct internal_hooks
 {
+    // todo CJSON_CDECL ??
+    //declare allocate as pointer to function (size_t) returning pointer to void
     void *(CJSON_CDECL *allocate)(size_t size);
     void (CJSON_CDECL *deallocate)(void *pointer);
     void *(CJSON_CDECL *reallocate)(void *pointer, size_t size);
@@ -192,10 +194,8 @@ static unsigned char* cJSON_strdup(const unsigned char* string, const internal_h
         return NULL;
     }
 
-    //sizeof("") == 1
     length = strlen((const char*)string) + sizeof("");
 //    printf("%s len: const char* len %lu\n",string, strlen((const char*)string));
-    //realloc
     copy = (unsigned char*)hooks->allocate(length);
     if (copy == NULL)
     {
@@ -427,9 +427,9 @@ CJSON_PUBLIC(char*) cJSON_SetValuestring(cJSON *object, const char *valuestring)
 typedef struct
 {
     unsigned char *buffer;
-    size_t length;
-    size_t offset;
-    size_t depth; /* current nesting depth (for formatted printing) */
+    size_t length;  // buffer大小
+    size_t offset;  // 偏移量？ 是如何变化的
+    size_t depth; /* current nesting depth (for formatted printing) */ /** object嵌套深度 */
     cJSON_bool noalloc;
     cJSON_bool format; /* is this print a formatted print */
     internal_hooks hooks;
@@ -461,6 +461,7 @@ static unsigned char* ensure(printbuffer * const p, size_t needed)
     needed += p->offset + 1;
     if (needed <= p->length)
     {
+        //todo 理解不了
         return p->buffer + p->offset;
     }
 
@@ -1050,6 +1051,7 @@ static parse_buffer *buffer_skip_whitespace(parse_buffer * const buffer)
        buffer->offset++;
     }
 
+    //todo ??
     if (buffer->offset == buffer->length)
     {
         buffer->offset--;
@@ -1337,12 +1339,12 @@ static cJSON_bool parse_value(cJSON * const item, parse_buffer * const input_buf
         input_buffer->offset += 4;
         return true;
     }
-    /* string */
+    /* string */ //""
     if (can_access_at_index(input_buffer, 0) && (buffer_at_offset(input_buffer)[0] == '\"'))
     {
         return parse_string(item, input_buffer);
     }
-    /* number */
+    /* number */ // '-'表示负数
     if (can_access_at_index(input_buffer, 0) && ((buffer_at_offset(input_buffer)[0] == '-') || ((buffer_at_offset(input_buffer)[0] >= '0') && (buffer_at_offset(input_buffer)[0] <= '9'))))
     {
         return parse_number(item, input_buffer);
@@ -1740,6 +1742,7 @@ static cJSON_bool print_object(const cJSON * const item, printbuffer * const out
     {
         if (output_buffer->format)
         {
+            //格式化拼接
             size_t i;
             output_pointer = ensure(output_buffer, output_buffer->depth);
             if (output_pointer == NULL)
@@ -1753,7 +1756,7 @@ static cJSON_bool print_object(const cJSON * const item, printbuffer * const out
             output_buffer->offset += output_buffer->depth;
         }
 
-        /* print key */
+        /* print key 输出键 */
         if (!print_string_ptr((unsigned char*)current_item->string, output_buffer))
         {
             return false;
@@ -1773,7 +1776,7 @@ static cJSON_bool print_object(const cJSON * const item, printbuffer * const out
         }
         output_buffer->offset += length;
 
-        /* print value */
+        /* print value 输出值 */
         if (!print_value(current_item, output_buffer))
         {
             return false;
@@ -1977,6 +1980,7 @@ static cJSON_bool add_item_to_array(cJSON *array, cJSON *item)
         if (child->prev)
         {
             suffix_object(child->prev, item);
+            //确定最后一个item
             array->child->prev = item;
         }
         else
@@ -2039,10 +2043,10 @@ static cJSON_bool add_item_to_object(cJSON * const object, const char * const st
             return false;
         }
 
-        new_type = item->type & ~cJSON_StringIsConst;
+        new_type = item->type & ~cJSON_StringIsConst; // 10 00000000 & 00000001
     }
 
-    //todo ???
+    //todo ???  非常量字符串
     if (!(item->type & cJSON_StringIsConst) && (item->string != NULL))
     {
         //free

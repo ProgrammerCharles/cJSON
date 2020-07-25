@@ -29,7 +29,7 @@ void test_FindFunction_WhichIsBroken_ShouldReturnZeroIfItemIsNotInList_WhichWork
 
 void test_FindFunction_WhichIsBroken_ShouldReturnTheIndexForItemsInList_WhichWillFailBecauseOurFunctionUnderTestIsBroken(void)
 {
-  // You should see this line fail in your test summary
+  // You should see this line fail in your test summary.md
   TEST_ASSERT_EQUAL(1, FindFunction_WhichIsBroken(34));
   
   // Notice the rest of these didn't get a chance to run because the line above failed.  
