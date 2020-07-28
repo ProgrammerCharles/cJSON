@@ -50,3 +50,12 @@ format
 ````
 定义 cJSON_CreateObject(void)
 调用 cJSON_CreateObject()
+
+已跟源代码
+------------------------------------
+cJSON_PrintPreallocated
+#### 数组
+- cJSON_CreateArray
+- cJSON_CreateIntArray
+- add_item_to_array
+- add_item_to_array NOTE line 1989

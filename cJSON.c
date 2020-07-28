@@ -461,7 +461,7 @@ static unsigned char* ensure(printbuffer * const p, size_t needed)
     needed += p->offset + 1;
     if (needed <= p->length)
     {
-        //todo 理解不了
+        //todo 理解不了  (char * + size_t)
         return p->buffer + p->offset;
     }
 
@@ -484,6 +484,7 @@ static unsigned char* ensure(printbuffer * const p, size_t needed)
     }
     else
     {
+        // needed * 2
         newsize = needed * 2;
     }
 
@@ -1291,6 +1292,7 @@ CJSON_PUBLIC(char *) cJSON_PrintBuffered(const cJSON *item, int prebuffer, cJSON
 
 CJSON_PUBLIC(cJSON_bool) cJSON_PrintPreallocated(cJSON *item, char *buffer, const int length, const cJSON_bool format)
 {
+    //准备 printbuffer
     printbuffer p = { 0, 0, 0, 0, 0, 0, { 0, 0, 0 } };
 
     if ((length < 0) || (buffer == NULL))
@@ -1969,22 +1971,22 @@ static cJSON_bool add_item_to_array(cJSON *array, cJSON *item)
      */
     if (child == NULL)
     {
-        /* list is empty, start new one */
+        /* 数组是空的 */
         array->child = item;
         item->prev = item;
         item->next = NULL;
     }
     else
     {
-        /* append to the end */
+        /* 数组非空 */
         if (child->prev)
         {
             suffix_object(child->prev, item);
-            //确定最后一个item
+            //prev指定当前Array中的最后一个item
             array->child->prev = item;
         }
         else
-        {
+        {//todo 怎么理解 什么情况下 child -> prev为NULL
             while (child->next)
             {
                 child = child->next;
@@ -1993,7 +1995,6 @@ static cJSON_bool add_item_to_array(cJSON *array, cJSON *item)
             array->child->prev = item;
         }
     }
-
     return true;
 }
 
@@ -2575,12 +2576,10 @@ CJSON_PUBLIC(cJSON *) cJSON_CreateIntArray(const int *numbers, int count)
             cJSON_Delete(a);
             return NULL;
         }
-        if(!i)
-        {
+
+        if(!i){// i = 0 & !0为真
             a->child = n;
-        }
-        else
-        {
+        }else{
             suffix_object(p, n);
         }
         p = n;

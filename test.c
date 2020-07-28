@@ -111,13 +111,13 @@ static void create_objects(void)
     /* declare a few. */
     cJSON *root = NULL;
     cJSON *fmt = NULL;
-    cJSON *img __attribute__((unused)) = NULL;
-    cJSON *thm __attribute__((unused)) = NULL;
+    cJSON * __attribute__((unused)) img = NULL;
+    cJSON * __attribute__((unused)) thm = NULL;
     cJSON *fld __attribute__((unused)) = NULL;
     int i __attribute__((unused)) = 0;
 
     /* Our "days of the week" array: */
-    const char *strings[7] __attribute__((unused)) =
+    const char __attribute__((unused)) *strings[7] =
     {
         "Sunday",
         "Monday",
@@ -128,14 +128,14 @@ static void create_objects(void)
         "Saturday"
     };
     /* Our matrix: */
-    int numbers[3][3] __attribute__((unused)) =
+    int numbers[3][3] =
     {
         {0, -1, 0},
         {1, 0, 0},
         {0 ,0, 1}
     };
     /* Our "gallery" item: */
-    int ids[4] __attribute__((unused)) = { 116, 943, 234, 38793 };
+    int __attribute__((unused)) ids[4] = { 116, 943, 234, 38793 };
     /* Our array of "records": */
     struct record fields[2]  __attribute__((unused)) =
     {
@@ -171,10 +171,10 @@ static void create_objects(void)
     cJSON_AddItemToObject(root, "name", cJSON_CreateString("Jack (\"Bee\") Nimble"));
     cJSON_AddItemToObject(root, "format", fmt = cJSON_CreateObject());
     cJSON_AddStringToObject(fmt, "type", "rect");
-//    cJSON_AddNumberToObject(fmt, "width", 1920);
-//    cJSON_AddNumberToObject(fmt, "height", 1080);
-//    cJSON_AddFalseToObject (fmt, "interlace");
-//    cJSON_AddNumberToObject(fmt, "frame rate", 24);
+    cJSON_AddNumberToObject(fmt, "width", 1920);
+    cJSON_AddNumberToObject(fmt, "height", 1080);
+    cJSON_AddFalseToObject (fmt, "interlace");
+    cJSON_AddNumberToObject(fmt, "frame rate", 24);
 
     /* Print to text */
     if (print_preallocated(root) != 0) {
@@ -192,23 +192,23 @@ static void create_objects(void)
 //        exit(EXIT_FAILURE);
 //    }
 //    cJSON_Delete(root);
-//
-//    /* Our matrix: */
-//    root = cJSON_CreateArray();
-//    for (i = 0; i < 3; i++)
-//    {
-//        cJSON_AddItemToArray(root, cJSON_CreateIntArray(numbers[i], 3));
-//    }
-//
-//    /* cJSON_ReplaceItemInArray(root, 1, cJSON_CreateString("Replacement")); */
-//
-//    if (print_preallocated(root) != 0) {
-//        cJSON_Delete(root);
-//        exit(EXIT_FAILURE);
-//    }
-//    cJSON_Delete(root);
-//
-//    /* Our "gallery" item: */
+
+    /* Our matrix: */
+    root = cJSON_CreateArray();
+    for (i = 0; i < 3; i++)
+    {
+        cJSON_AddItemToArray(root, cJSON_CreateIntArray(numbers[i], 3));
+    }
+
+    /* cJSON_ReplaceItemInArray(root, 1, cJSON_CreateString("Replacement")); */
+
+    if (print_preallocated(root) != 0) {
+        cJSON_Delete(root);
+        exit(EXIT_FAILURE);
+    }
+    cJSON_Delete(root);
+
+    /* Our "gallery" item: */
 //    root = cJSON_CreateObject();
 //    cJSON_AddItemToObject(root, "Image", img = cJSON_CreateObject());
 //    cJSON_AddNumberToObject(img, "Width", 800);
@@ -225,8 +225,8 @@ static void create_objects(void)
 //        exit(EXIT_FAILURE);
 //    }
 //    cJSON_Delete(root);
-//
-//    /* Our array of "records": */
+
+    /* Our array of "records": */
 //    root = cJSON_CreateArray();
 //    for (i = 0; i < 2; i++)
 //    {
