@@ -43,6 +43,7 @@ static cJSON *parse_file(const char *filename)
     return parsed;
 }
 
+//看下I/O
 static void do_test(const char *test_name)
 {
     char *expected = NULL;
@@ -57,8 +58,9 @@ static void do_test(const char *test_name)
 
     test_name_length = strlen(test_name);
 
-    /* allocate file paths */
-#define TEST_DIR_PATH "inputs/"
+    /* allocate file paths 方法里也可以定义宏 */
+    #define TEST_DIR_PATH "inputs/"
+
     test_path = (char*)malloc(sizeof(TEST_DIR_PATH) + test_name_length);
     TEST_ASSERT_NOT_NULL_MESSAGE(test_path, "Failed to allocate test_path buffer.");
     expected_path = (char*)malloc(sizeof(TEST_DIR_PATH) + test_name_length + sizeof(".expected"));

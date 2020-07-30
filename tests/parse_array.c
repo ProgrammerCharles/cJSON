@@ -155,9 +155,10 @@ static void parse_array_should_not_parse_non_arrays(void)
 
 int CJSON_CDECL main(void)
 {
+//    printf("size of string is %lu\n", sizeof(""));
+//    printf("len of string is %lu", strlen(""));
     /* initialize cJSON item */
     memset(item, 0, sizeof(cJSON));
-
     UNITY_BEGIN();
     RUN_TEST(parse_array_should_parse_empty_arrays);
     RUN_TEST(parse_array_should_parse_arrays_with_one_element);

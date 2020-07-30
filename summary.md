@@ -8,7 +8,8 @@
 ````
    parse_buffer buffer = { 0, 0, 0, 0, { 0, 0, 0 } };
 ````
-7. whitespace and cr/lf  https://www.jianshu.com/p/8d33019d1c69
+1. whitespace and cr/lf  https://www.jianshu.com/p/8d33019d1c69
+2. 文件读取  标准库   fopen fread
 
 
 ----------------------------------
@@ -47,6 +48,35 @@ format
     prev -> name
     next -> null
 
+
+typedef struct
+{
+    const unsigned char *content; //将要解析的字符串
+    size_t length;                //字符串长度
+    size_t offset;                //从0开始; 步长1; 字符串偏移量 范围 0 -- length-1
+    size_t depth; /* How deeply nested (in arrays/objects) is the input at the current offset. */
+    internal_hooks hooks;
+} parse_buffer;
+
+
+typedef struct 
+{
+    unsigned char *buffer;
+    size_t length;  // buffer大小
+    size_t offset;  // 偏移量
+    size_t depth; /* current nesting depth (for formatted printing) */ /** object嵌套深度 */
+    cJSON_bool noalloc;
+    cJSON_bool format; /* is this print a formatted print */
+    internal_hooks hooks;
+} printbuffer; //printbuffer 属性参照parse_buffer
+
+
+C标准
+----------------------------
+fseek(file, 0, SEEK_END) 
+ftell(file)
+配合，可知文件内容大小，单位：字节
+
 ````
 定义 cJSON_CreateObject(void)
 调用 cJSON_CreateObject()
@@ -59,3 +89,9 @@ cJSON_PrintPreallocated
 - cJSON_CreateIntArray
 - add_item_to_array
 - add_item_to_array NOTE line 1989
+- parse_array
+
+
+附
+---------------
+\t属于转义字符。是水平制表符，相当于键盘上的TAB按键du。通常宽度相当于8个空格的位置，
