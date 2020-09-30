@@ -10,6 +10,8 @@
 ````
 1. whitespace and cr/lf  https://www.jianshu.com/p/8d33019d1c69
 2. 文件读取  标准库   fopen fread
+3. char '\0' === int 0
+4. 调了allocate 就要调free
 
 
 ----------------------------------
@@ -89,8 +91,26 @@ cJSON_PrintPreallocated
 - cJSON_CreateIntArray
 - add_item_to_array
 - add_item_to_array NOTE line 1989
+
+Parse
+- cJSON_Parse
+
 - parse_array
 
+Compare 
+- cJSON_Compare 
+- compare_from_string
+
+get_object_item
+- get_object_item
+- cJSON_IsString
+- cJSON_IsArray
+
+cJSON_Duplicate
+
+
+cJson_Utils
+- decode_patch_operation
 
 附
 ---------------

@@ -41,6 +41,7 @@ static cJSON *parse_test_file(const char * const filename)
     TEST_ASSERT_NOT_NULL_MESSAGE(json, "Failed to parse test json.");
     TEST_ASSERT_TRUE_MESSAGE(cJSON_IsArray(json), "Json is not an array.");
 
+    //注意file的类型 不是File* !!!
     free(file);
 
     return json;
@@ -88,7 +89,7 @@ static cJSON_bool test_apply_patch(const cJSON * const test)
     error_element = cJSON_GetObjectItemCaseSensitive(test, "error");
     if (error_element != NULL)
     {
-        /* excepting an error */
+        /* excepting an error */ //【ignore】
         TEST_ASSERT_TRUE_MESSAGE(0 != cJSONUtils_ApplyPatchesCaseSensitive(object, patch), "Test didn't fail as it's supposed to.");
 
         successful = true;
@@ -236,8 +237,8 @@ int main(void)
     UNITY_BEGIN();
 
     RUN_TEST(cjson_utils_should_pass_json_patch_test_tests);
-    RUN_TEST(cjson_utils_should_pass_json_patch_test_spec_tests);
-    RUN_TEST(cjson_utils_should_pass_json_patch_test_cjson_utils_tests);
+    //RUN_TEST(cjson_utils_should_pass_json_patch_test_spec_tests);
+    //RUN_TEST(cjson_utils_should_pass_json_patch_test_cjson_utils_tests);
 
     return UNITY_END();
 }
