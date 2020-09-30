@@ -24,12 +24,14 @@
 #include "unity/src/unity.h"
 #include "common.h"
 
+//
 static cJSON_bool compare_from_string(const char * const a, const char * const b, const cJSON_bool case_sensitive)
 {
     cJSON *a_json = NULL;
     cJSON *b_json = NULL;
     cJSON_bool result = false;
 
+    //a [] && b []
     a_json = cJSON_Parse(a);
     TEST_ASSERT_NOT_NULL_MESSAGE(a_json, "Failed to parse a.");
     b_json = cJSON_Parse(b);
@@ -125,7 +127,7 @@ static void cjson_compare_should_compare_raw(void)
 
     raw1 = cJSON_Parse("\"[true, false]\"");
     TEST_ASSERT_NOT_NULL(raw1);
-    raw2 = cJSON_Parse("\"[true, false]\"");
+    raw2 = cJSON_Parse("\"[True, false]\"");
     TEST_ASSERT_NOT_NULL(raw2);
 
     raw1->type = cJSON_Raw;
@@ -189,6 +191,8 @@ static void cjson_compare_should_compare_objects(void)
                 false))
 }
 
+int interger;
+
 int CJSON_CDECL main(void)
 {
     UNITY_BEGIN();
@@ -203,6 +207,22 @@ int CJSON_CDECL main(void)
     RUN_TEST(cjson_compare_should_compare_raw);
     RUN_TEST(cjson_compare_should_compare_arrays);
     RUN_TEST(cjson_compare_should_compare_objects);
+
+    printf("------------------------------\n");
+//    char *pointer = 0;
+//    printf("pointer is NULL? %d", pointer == NULL);
+
+//    size_t strLength = strlen("null");
+//    printf("null length is %lu\n", strLength);
+//
+//    size_t strLength1 = strlen("false");
+//    printf("false length is %lu\n", strLength1);
+//
+//    size_t strLength2 = strlen("true");
+//    printf("true length is %lu\n", strLength2);
+
+//    int i = 0;
+    printf("the uninit i value is %d", interger);
 
     return UNITY_END();
 }

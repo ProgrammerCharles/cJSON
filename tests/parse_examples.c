@@ -46,6 +46,7 @@ static cJSON *parse_file(const char *filename)
 //看下I/O
 static void do_test(const char *test_name)
 {
+    //从test文件读出内容，转为json字符串，与expected文件中的内容进行比对
     char *expected = NULL;
     char *actual = NULL;
     cJSON *tree = NULL;
@@ -61,8 +62,12 @@ static void do_test(const char *test_name)
     /* allocate file paths 方法里也可以定义宏 */
     #define TEST_DIR_PATH "inputs/"
 
+    // "inputs/test1"
     test_path = (char*)malloc(sizeof(TEST_DIR_PATH) + test_name_length);
+
+    // 单元测试怎么完成的？
     TEST_ASSERT_NOT_NULL_MESSAGE(test_path, "Failed to allocate test_path buffer.");
+
     expected_path = (char*)malloc(sizeof(TEST_DIR_PATH) + test_name_length + sizeof(".expected"));
     TEST_ASSERT_NOT_NULL_MESSAGE(expected_path, "Failed to allocate expected_path buffer.");
 
@@ -254,6 +259,8 @@ static void test14_should_not_be_parsed(void)
 
 int CJSON_CDECL main(void)
 {
+    #define ArrayForEach(element, array) for(element = (array != NULL) ? (array)->child : NULL; element != NULL; element = element->next)
+
     UNITY_BEGIN();
     RUN_TEST(file_test1_should_be_parsed_and_printed);
     RUN_TEST(file_test2_should_be_parsed_and_printed);

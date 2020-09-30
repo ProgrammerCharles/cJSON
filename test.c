@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "cJSON.h"
+#include<limits.h>
 
 /* Used by some code below as an example datatype. */
 struct record
@@ -259,6 +260,46 @@ static void create_objects(void)
 //    cJSON_Delete(root);
 }
 
+//void testDataTypeRange(){
+    //    printf("char min: %d, char max: %d\n" , CHAR_MIN, CHAR_MAX); // 占用 1byte
+    //    printf("short int min: %d, short int max: %d\n" , SHRT_MIN, SHRT_MAX);// short 占用 2byte
+    //    printf("int min: %d, int max: %d\n" , INT_MIN, INT_MAX); // 占用 4byte
+    //    printf("long int min: %ld, long int max: %ld\n" , LONG_MIN, LONG_MAX);
+//}
+
+//error: function declaration isn't a prototype
+static void test_print(void){
+//    const char* printMsg = "hello, world";
+
+    int integer = 1234;
+
+    //  %[-]字段宽度.精度[转换字符]
+//    printf(":%s:\n", printMsg);
+    printf("------------\n");
+
+    //可以比较
+//    printf(":%15s:\n", printMsg);
+//    printf(":%-15s:\n", printMsg);
+//
+//    printf("------------\n");
+//    printf(":%.10s:\n", printMsg);
+//    printf(":%.15s:\n", printMsg);
+//
+//    printf("------------\n");
+//    printf(":%15.10s:\n", printMsg);
+//    printf(":%-15.10s:\n", printMsg);
+
+    /* 整型 精度小于长度，不会出现整型截断 */
+    printf(":%5d:\n", integer);
+    printf(":%-5d:\n", integer);
+
+    printf(":%.5d:\n", integer);
+    printf(":%.3d:\n", integer);
+
+    printf(":%5.3d:\n", integer);
+    printf(":%-5.3d:\n", integer);
+}
+
 int CJSON_CDECL main(void)
 {
     /* print the version */
@@ -266,6 +307,9 @@ int CJSON_CDECL main(void)
 
     /* Now some samplecode for building objects concisely: */
     create_objects();
+
+    printf("-----------------------------\n");
+    test_print();
 
     return 0;
 }

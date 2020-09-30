@@ -57,7 +57,7 @@ char* read_file(const char *filename) {
         goto cleanup;
     }
 
-    /* get the length */
+    /* get the length 文件长度不为0，表示文件内容不为空*/
     if (fseek(file, 0, SEEK_END) != 0)
     {
         goto cleanup;

@@ -9,7 +9,8 @@
    parse_buffer buffer = { 0, 0, 0, 0, { 0, 0, 0 } };
 ````
 1. whitespace and cr/lf  https://www.jianshu.com/p/8d33019d1c69
-2. 文件读取  标准库   fopen fread
+2. 文件读取  标准库   fopen fread fseek获取文件内容长度  ftell
+3. 宏 (...) 可变参数
 
 
 ----------------------------------
@@ -77,6 +78,9 @@ fseek(file, 0, SEEK_END)
 ftell(file)
 配合，可知文件内容大小，单位：字节
 
+int sprintf(char *str, const char *format, ...) 
+发送格式化输出到 str 所指向的字符串。
+
 ````
 定义 cJSON_CreateObject(void)
 调用 cJSON_CreateObject()
@@ -92,6 +96,23 @@ cJSON_PrintPreallocated
 - parse_array
 
 
+CJSON
+-----------------------------------------
+方法
+- cJSON_GetObjectItemCaseSensitive
+    - get_object_item
+    
+- cJSON_Parse
+    - cJSON_ParseWithOpts
+    - parse_value
+    - parse_string
+- cJSON_Compare 
+    
+    
+#### 对象
+
 附
 ---------------
-\t属于转义字符。是水平制表符，相当于键盘上的TAB按键du。通常宽度相当于8个空格的位置，
+\t属于转义字符。是水平制表符，相当于键盘上的TAB按键。通常宽度相当于8个空格的位置，
+
+input_end这样的字符指针强转为size_t类型的值，该值表示什么？

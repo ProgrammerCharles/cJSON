@@ -541,6 +541,7 @@ static void update_offset(printbuffer * const buffer)
 /* securely comparison of floating-point variables */
 static cJSON_bool compare_double(double a, double b)
 {
+    // double类型比较大小
     double maxVal = fabs(a) > fabs(b) ? fabs(a) : fabs(b);
     return (fabs(a - b) <= maxVal * DBL_EPSILON);
 }
@@ -778,6 +779,7 @@ static cJSON_bool parse_string(cJSON * const item, parse_buffer * const input_bu
     unsigned char *output = NULL;
 
     /* not a string */
+    //这个判断是不是有点多余
     if (buffer_at_offset(input_buffer)[0] != '\"')
     {
         goto fail;
@@ -787,9 +789,13 @@ static cJSON_bool parse_string(cJSON * const item, parse_buffer * const input_bu
         /* calculate approximate size of the output (overestimate) */
         size_t allocation_length = 0;
         size_t skipped_bytes = 0;
+
+//        size_t ret1 = (size_t) (input_end - input_buffer->content);
+//        printf("%lu minus %lu, equals %lu\n", (size_t)input_end, (size_t)input_buffer->content, ret1);
+        //todo 疑问 input_end这样的字符指针强转为size_t类型的值，该值表示什么？
         while (((size_t)(input_end - input_buffer->content) < input_buffer->length) && (*input_end != '\"'))
         {
-            /* is escape sequence */
+            /* is escape sequence 转义字符串 */
             if (input_end[0] == '\\')
             {
                 if ((size_t)(input_end + 1 - input_buffer->content) >= input_buffer->length)
@@ -800,8 +806,9 @@ static cJSON_bool parse_string(cJSON * const item, parse_buffer * const input_bu
                 skipped_bytes++;
                 input_end++;
             }
-            input_end++;
+            input_end++;//算input_end呗
         }
+//        printf("input_end is %lu\n", (size_t)input_end);
         if (((size_t)(input_end - input_buffer->content) >= input_buffer->length) || (*input_end != '\"'))
         {
             goto fail; /* string ended unexpectedly */
@@ -1034,7 +1041,7 @@ static cJSON_bool print_array(const cJSON * const item, printbuffer * const outp
 static cJSON_bool parse_object(cJSON * const item, parse_buffer * const input_buffer);
 static cJSON_bool print_object(const cJSON * const item, printbuffer * const output_buffer);
 
-/* Utility to jump whitespace and cr/lf */
+/* Utility to jump whitespace and cr/lf 跳过空格符  换行符 */
 static parse_buffer *buffer_skip_whitespace(parse_buffer * const buffer)
 {
     if ((buffer == NULL) || (buffer->content == NULL))
@@ -1096,7 +1103,7 @@ CJSON_PUBLIC(cJSON *) cJSON_ParseWithOpts(const char *value, const char **return
 /* Parse an object - create a new root, and populate. */
 CJSON_PUBLIC(cJSON *) cJSON_ParseWithLengthOpts(const char *value, size_t buffer_length, const char **return_parse_end, cJSON_bool require_null_terminated)
 {
-    parse_buffer buffer = { 0, 0, 0, 0, { 0, 0, 0 } };
+    parse_buffer buffer = {0, 0, 0, 0, { 0, 0, 0 } };
     cJSON *item = NULL;
 
     /* reset error position */
@@ -1321,7 +1328,10 @@ static cJSON_bool parse_value(cJSON * const item, parse_buffer * const input_buf
 
     /* parse the different types of values */
     /* null */
-    if (can_read(input_buffer, 4) && (strncmp((const char*)buffer_at_offset(input_buffer), "null", 4) == 0))
+
+    //can_read means offset + size < length
+    //strlen("null") == 4
+    if (can_read(input_buffer, strlen("null")) && (strncmp((const char*)buffer_at_offset(input_buffer), "null", 4) == 0))
     {
         item->type = cJSON_NULL;
         input_buffer->offset += 4;
@@ -1342,7 +1352,8 @@ static cJSON_bool parse_value(cJSON * const item, parse_buffer * const input_buf
         input_buffer->offset += 4;
         return true;
     }
-    /* string */ //""
+    /* string */
+    //  字符串是以'\"'开头
     if (can_access_at_index(input_buffer, 0) && (buffer_at_offset(input_buffer)[0] == '\"'))
     {
         return parse_string(item, input_buffer);
@@ -1357,7 +1368,7 @@ static cJSON_bool parse_value(cJSON * const item, parse_buffer * const input_buf
     {
         return parse_array(item, input_buffer);
     }
-    /* object */
+    /* object */ // '{'
     if (can_access_at_index(input_buffer, 0) && (buffer_at_offset(input_buffer)[0] == '{'))
     {
         return parse_object(item, input_buffer);
@@ -1882,27 +1893,28 @@ CJSON_PUBLIC(cJSON *) cJSON_GetArrayItem(const cJSON *array, int index)
     return get_array_item(array, (size_t)index);
 }
 
+/**
+ * 在object中查找名称为name的属性
+ * @param object
+ * @param name
+ * @param case_sensitive
+ * @return
+ */
 static cJSON *get_object_item(const cJSON * const object, const char * const name, const cJSON_bool case_sensitive)
 {
     cJSON *current_element = NULL;
 
-    if ((object == NULL) || (name == NULL))
-    {
+    if ((object == NULL) || (name == NULL)){
         return NULL;
     }
 
     current_element = object->child;
-    if (case_sensitive)
-    {
-        while ((current_element != NULL) && (current_element->string != NULL) && (strcmp(name, current_element->string) != 0))
-        {
+    if(case_sensitive){
+        while ((current_element != NULL) && (current_element->string != NULL) && (strcmp(name, current_element->string) != 0)){
             current_element = current_element->next;
         }
-    }
-    else
-    {
-        while ((current_element != NULL) && (case_insensitive_strcmp((const unsigned char*)name, (const unsigned char*)(current_element->string)) != 0))
-        {
+    }else{
+        while ((current_element != NULL) && (case_insensitive_strcmp((const unsigned char*)name, (const unsigned char*)(current_element->string)) != 0)){
             current_element = current_element->next;
         }
     }
@@ -2442,6 +2454,7 @@ CJSON_PUBLIC(cJSON *) cJSON_CreateBool(cJSON_bool boolean)
 CJSON_PUBLIC(cJSON *) cJSON_CreateNumber(double num)
 {
     cJSON *item = cJSON_New_Item(&global_hooks);
+
     if(item)
     {
         item->type = cJSON_Number;
@@ -3034,7 +3047,7 @@ CJSON_PUBLIC(cJSON_bool) cJSON_Compare(const cJSON * const a, const cJSON * cons
             return false;
 
         case cJSON_Array:
-        {
+        {   // 数组元素依次比对
             cJSON *a_element = a->child;
             cJSON *b_element = b->child;
 
@@ -3050,6 +3063,7 @@ CJSON_PUBLIC(cJSON_bool) cJSON_Compare(const cJSON * const a, const cJSON * cons
             }
 
             /* one of the arrays is longer than the other */
+            // 数组长度不同
             if (a_element != b_element) {
                 return false;
             }

@@ -42,6 +42,7 @@ static const char *json = "{\n\
 \t\t}]\n\
 }";
 
+//创建 resolutions 数组
 static char* create_monitor(void)
 {
     const unsigned int resolution_numbers[3][2] = {
@@ -58,46 +59,42 @@ static char* create_monitor(void)
     size_t index = 0;
 
     cJSON *monitor = cJSON_CreateObject();
-    if (monitor == NULL)
-    {
+    if (monitor == NULL){
         goto end;
     }
 
     name = cJSON_CreateString("Awesome 4K");
-    if (name == NULL)
-    {
+    if (name == NULL){
         goto end;
     }
+
+    //Object(name)
     /* after creation was successful, immediately add it to the monitor,
      * thereby transfering ownership of the pointer to it */
     cJSON_AddItemToObject(monitor, "name", name);
 
     resolutions = cJSON_CreateArray();
-    if (resolutions == NULL)
-    {
+    if (resolutions == NULL){
         goto end;
     }
+    //Object(name resolutions)
     cJSON_AddItemToObject(monitor, "resolutions", resolutions);
 
-    for (index = 0; index < (sizeof(resolution_numbers) / (2 * sizeof(int))); ++index)
-    {
+    for (index = 0; index < (sizeof(resolution_numbers) / (2 * sizeof(int))); ++index){
         resolution = cJSON_CreateObject();
-        if (resolution == NULL)
-        {
+        if (resolution == NULL){
             goto end;
         }
         cJSON_AddItemToArray(resolutions, resolution);
 
         width = cJSON_CreateNumber(resolution_numbers[index][0]);
-        if (width == NULL)
-        {
+        if (width == NULL){
             goto end;
         }
         cJSON_AddItemToObject(resolution, "width", width);
 
         height = cJSON_CreateNumber(resolution_numbers[index][1]);
-        if (height == NULL)
-        {
+        if (height == NULL){
             goto end;
         }
         cJSON_AddItemToObject(resolution, "height", height);
@@ -114,6 +111,7 @@ end:
     return string;
 }
 
+//Object(name resolutions)
 static char *create_monitor_with_helpers(void)
 {
     const unsigned int resolution_numbers[3][2] = {
@@ -125,16 +123,16 @@ static char *create_monitor_with_helpers(void)
     cJSON *resolutions = NULL;
     size_t index = 0;
 
+    //Object
     cJSON *monitor = cJSON_CreateObject();
 
-    if (cJSON_AddStringToObject(monitor, "name", "Awesome 4K") == NULL)
-    {
+    //Object(name)
+    if (cJSON_AddStringToObject(monitor, "name", "Awesome 4K") == NULL){
         goto end;
     }
 
     resolutions = cJSON_AddArrayToObject(monitor, "resolutions");
-    if (resolutions == NULL)
-    {
+    if (resolutions == NULL){
         goto end;
     }
 
@@ -185,8 +183,7 @@ static int supports_full_hd(const char * const monitor)
     }
 
     name = cJSON_GetObjectItemCaseSensitive(monitor_json, "name");
-    if (cJSON_IsString(name) && (name->valuestring != NULL))
-    {
+    if (cJSON_IsString(name) && (name->valuestring != NULL)){
         printf("Checking monitor \"%s\"\n", name->valuestring);
     }
 
