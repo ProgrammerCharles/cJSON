@@ -259,7 +259,7 @@ static void test14_should_not_be_parsed(void)
 
 int CJSON_CDECL main(void)
 {
-    #define ArrayForEach(element, array) for(element = (array != NULL) ? (array)->child : NULL; element != NULL; element = element->next)
+//    #define ArrayForEach(element, array) for(element = (array != NULL) ? (array)->child : NULL; element != NULL; element = element->next)
 
     UNITY_BEGIN();
     RUN_TEST(file_test1_should_be_parsed_and_printed);

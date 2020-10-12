@@ -3,20 +3,36 @@
 3. C 库函数 size_t strlen(const char *str) 计算字符串 str 的长度，直到空结束字符，但不包括空结束字符。
 4. 宏
 5. cJSON.c line 185  global_hooks的定义
-
 6. struct 的初始化
 ````
    parse_buffer buffer = { 0, 0, 0, 0, { 0, 0, 0 } };
 ````
-1. whitespace and cr/lf  https://www.jianshu.com/p/8d33019d1c69
+
+1. whitespace and cr/lf  https://www.jianshu.com/p/8d33019d1c69  
+
+|||
+|----|----|
+|\t |制表符tab键 | 
+|\r |回车 |
+|\n |回车换行
 2. 文件读取  标准库   fopen fread fseek获取文件内容长度  ftell
 3. 宏 (...) 可变参数
+4. char '\0' === int 0
+5. 调了allocate 就要调free
+6. '\0'为ASCII码表第一个表项，为空字符串NUL
+
+
+    关于二次指针的理解
+    C为值传递，函数参数为指针类型，在函数中为该指针的拷贝；函数参数为二次指针，在该函数中为该指针（原指针）
+
+    关于指针++操作的理解 
+    （前提：数组指针表示）指针指向地址，指针++操作表示指针指向的地址发生变化，所以读取的第一个元素发生变化
+
+
+
 
 
 ----------------------------------
-
-
-
 |符号|意义|
 |----|----|
 |%d| 　　 有符号10进制整数（%ld 长整型，%hd短整型 ）|
@@ -32,10 +48,8 @@
 |%s| 　　 输入输出为字符串|
 
 
-----------------------------------
-
-
 cJSON数据结构
+----
 
 ````
 video
@@ -93,8 +107,26 @@ cJSON_PrintPreallocated
 - cJSON_CreateIntArray
 - add_item_to_array
 - add_item_to_array NOTE line 1989
+
+Parse
+- cJSON_Parse
+
 - parse_array
 
+Compare 
+- cJSON_Compare 
+- compare_from_string
+
+get_object_item
+- get_object_item
+- cJSON_IsString
+- cJSON_IsArray
+
+cJSON_Duplicate
+
+
+cJson_Utils
+- decode_patch_operation
 
 CJSON
 -----------------------------------------
@@ -107,6 +139,9 @@ CJSON
     - parse_value
     - parse_string
 - cJSON_Compare 
+- cJSON_Minify
+    - skip_oneline_comment
+    - skip_multiline_comment
     
     
 #### 对象

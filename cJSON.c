@@ -108,7 +108,6 @@ CJSON_PUBLIC(double) cJSON_GetNumberValue(const cJSON * const item)
     {
         return NAN;
     }
-
     return item->valuedouble;
 }
 
@@ -256,10 +255,13 @@ CJSON_PUBLIC(void) cJSON_Delete(cJSON *item)
     while (item != NULL)
     {
         next = item->next;
+        // item->child != null 表示 An array or object item will have a child pointer 
         if (!(item->type & cJSON_IsReference) && (item->child != NULL))
         {
             cJSON_Delete(item->child);
         }
+
+        // item->valuestring != null 表示 string 或 json raw
         if (!(item->type & cJSON_IsReference) && (item->valuestring != NULL))
         {
             global_hooks.deallocate(item->valuestring);
@@ -1893,6 +1895,7 @@ CJSON_PUBLIC(cJSON *) cJSON_GetArrayItem(const cJSON *array, int index)
     return get_array_item(array, (size_t)index);
 }
 
+
 /**
  * 在object中查找名称为name的属性
  * @param object
@@ -1900,21 +1903,27 @@ CJSON_PUBLIC(cJSON *) cJSON_GetArrayItem(const cJSON *array, int index)
  * @param case_sensitive
  * @return
  */
-static cJSON *get_object_item(const cJSON * const object, const char * const name, const cJSON_bool case_sensitive)
+static cJSON *get_object_item(const cJSON * const object, const char * const attr, const cJSON_bool case_sensitive)
 {
     cJSON *current_element = NULL;
 
-    if ((object == NULL) || (name == NULL)){
+    if ((object == NULL) || (attr == NULL))
+    {
         return NULL;
     }
 
     current_element = object->child;
-    if(case_sensitive){
-        while ((current_element != NULL) && (current_element->string != NULL) && (strcmp(name, current_element->string) != 0)){
+    if (case_sensitive)//true
+    { 
+        while ((current_element != NULL) && (current_element->string != NULL) && (strcmp(attr, current_element->string) != 0))
+        {
             current_element = current_element->next;
         }
-    }else{
-        while ((current_element != NULL) && (case_insensitive_strcmp((const unsigned char*)name, (const unsigned char*)(current_element->string)) != 0)){
+    }
+    else
+    {
+        while ((current_element != NULL) && (case_insensitive_strcmp((const unsigned char*)attr, (const unsigned char*)(current_element->string)) != 0))
+        {
             current_element = current_element->next;
         }
     }
@@ -1931,9 +1940,9 @@ CJSON_PUBLIC(cJSON *) cJSON_GetObjectItem(const cJSON * const object, const char
     return get_object_item(object, string, false);
 }
 
-CJSON_PUBLIC(cJSON *) cJSON_GetObjectItemCaseSensitive(const cJSON * const object, const char * const string)
+CJSON_PUBLIC(cJSON *) cJSON_GetObjectItemCaseSensitive(const cJSON * const object, const char * const attr)
 {
-    return get_object_item(object, string, true);
+    return get_object_item(object, attr, true);
 }
 
 CJSON_PUBLIC(cJSON_bool) cJSON_HasObjectItem(const cJSON *object, const char *string)
@@ -2734,6 +2743,8 @@ CJSON_PUBLIC(cJSON *) cJSON_Duplicate(const cJSON *item, cJSON_bool recurse)
     newitem->type = item->type & (~cJSON_IsReference);
     newitem->valueint = item->valueint;
     newitem->valuedouble = item->valuedouble;
+
+    //【注意】引用要duplicate
     if (item->valuestring)
     {
         newitem->valuestring = (char*)cJSON_strdup((unsigned char*)item->valuestring, &global_hooks);
@@ -2791,6 +2802,9 @@ fail:
     return NULL;
 }
 
+/**
+ * 处理单行注释
+ */
 static void skip_oneline_comment(char **input)
 {
     *input += static_strlen("//");
@@ -2804,6 +2818,9 @@ static void skip_oneline_comment(char **input)
     }
 }
 
+/**
+ * 处理多行注释
+ */
 static void skip_multiline_comment(char **input)
 {
     *input += static_strlen("/*");
@@ -2840,6 +2857,7 @@ static void minify_string(char **input, char **output) {
     }
 }
 
+//【字符串指针操作】
 CJSON_PUBLIC(void) cJSON_Minify(char *json)
 {
     char *into = json;
@@ -2849,6 +2867,7 @@ CJSON_PUBLIC(void) cJSON_Minify(char *json)
         return;
     }
 
+    //遍历字符串
     while (json[0] != '\0')
     {
         switch (json[0])
@@ -2863,17 +2882,20 @@ CJSON_PUBLIC(void) cJSON_Minify(char *json)
             case '/':
                 if (json[1] == '/')
                 {
-                    skip_oneline_comment(&json);
+                    //单行注释
+                    skip_oneline_comment(&json);// char *json
                 }
                 else if (json[1] == '*')
                 {
+                    //多行注释
                     skip_multiline_comment(&json);
                 } else {
+                    // char* ++操作
                     json++;
                 }
                 break;
 
-            case '\"':
+            case '\"'://转义字符
                 minify_string(&json, (char**)&into);
                 break;
 
@@ -3027,6 +3049,7 @@ CJSON_PUBLIC(cJSON_bool) cJSON_Compare(const cJSON * const a, const cJSON * cons
             return true;
 
         case cJSON_Number:
+            //note double类型的比较
             if (compare_double(a->valuedouble, b->valuedouble))
             {
                 return true;
@@ -3035,6 +3058,7 @@ CJSON_PUBLIC(cJSON_bool) cJSON_Compare(const cJSON * const a, const cJSON * cons
 
         case cJSON_String:
         case cJSON_Raw:
+            //原生json串或字符串直接调用 strcmp 比较即可
             if ((a->valuestring == NULL) || (b->valuestring == NULL))
             {
                 return false;
@@ -3077,6 +3101,7 @@ CJSON_PUBLIC(cJSON_bool) cJSON_Compare(const cJSON * const a, const cJSON * cons
             cJSON *b_element = NULL;
             cJSON_ArrayForEach(a_element, a)
             {
+                /* 对象的属性比较的时间复杂度O(n^2),比较糟糕 */
                 /* TODO This has O(n^2) runtime, which is horrible! */
                 b_element = get_object_item(b, a_element->string, case_sensitive);
                 if (b_element == NULL)

@@ -1,7 +1,28 @@
 [
+    { "comment": "empty list, empty docs",
+      "doc": {},
+      "patch": [],
+      "expected": {} },
 
+    { "comment": "empty patch list",
+      "doc": {"foo": 1},
+      "patch": [],
+      "expected": {"foo": 1} },
 
+    { "comment": "rearrangements OK?",
+      "doc": {"foo": 1, "bar": 2},
+      "patch": [],
+      "expected": {"bar":2, "foo": 1} },
 
+    { "comment": "rearrangements OK?  How about one level down ... array",
+      "doc": [{"foo": 1, "bar": 2}],
+      "patch": [],
+      "expected": [{"bar":2, "foo": 1}] },
+
+    { "comment": "rearrangements OK?  How about one level down...",
+      "doc": {"foo":{"foo": 1, "bar": 2}},
+      "patch": [],
+      "expected": {"foo":{"bar":2, "foo": 1}} },
 
     { "comment": "add replaces any existing field",
       "doc": {"foo": null},
@@ -13,7 +34,10 @@
       "patch": [{"op": "add", "path": "/0", "value": "foo"}],
       "expected": ["foo"] },
 
- 
+    { "comment": "toplevel array, no change",
+      "doc": ["foo"],
+      "patch": [],
+      "expected": ["foo"] },
 
     { "comment": "toplevel object, numeric string",
       "doc": {},
@@ -31,7 +55,15 @@
       "expected": "bar",
       "disabled": true },
 
+    { "comment": "replace object document with array document?",
+      "doc": {},
+      "patch": [{"op": "add", "path": "", "value": []}],
+      "expected": [] },
 
+    { "comment": "replace array document with object document?",
+      "doc": [],
+      "patch": [{"op": "add", "path": "", "value": {}}],
+      "expected": {} },
 
     { "comment": "append to root array document?",
       "doc": [],

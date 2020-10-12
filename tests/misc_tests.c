@@ -32,6 +32,7 @@
 static void cjson_array_foreach_should_loop_over_arrays(void)
 {
     cJSON array[1];
+    // 双向链表
     cJSON elements[10];
     cJSON *element_pointer = NULL;
     size_t i = 0;

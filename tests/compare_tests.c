@@ -39,6 +39,7 @@ static cJSON_bool compare_from_string(const char * const a, const char * const b
 
     result = cJSON_Compare(a_json, b_json, case_sensitive);
 
+    //【注意】仔细想一想，这里为什么要调cJSON_Delete
     cJSON_Delete(a_json);
     cJSON_Delete(b_json);
 
@@ -54,6 +55,7 @@ static void cjson_compare_should_compare_null_pointer_as_not_equal(void)
 static void cjson_compare_should_compare_invalid_as_not_equal(void)
 {
     cJSON invalid[1];
+    //【C习惯】C里对结构体初始化0值，其实就是空值
     memset(invalid, '\0', sizeof(invalid));
 
     TEST_ASSERT_FALSE(cJSON_Compare(invalid, invalid, false));
@@ -111,7 +113,7 @@ static void cjson_compare_should_not_accept_invalid_types(void)
     TEST_ASSERT_FALSE(cJSON_Compare(invalid, invalid, false));
 }
 
-static void cjson_compare_should_compare_strings(void)
+__attribute__((unused)) static void cjson_compare_should_compare_strings(void)
 {
     TEST_ASSERT_TRUE(compare_from_string("\"abcdefg\"", "\"abcdefg\"", true));
     TEST_ASSERT_TRUE(compare_from_string("\"abcdefg\"", "\"abcdefg\"", false));
@@ -120,7 +122,7 @@ static void cjson_compare_should_compare_strings(void)
     TEST_ASSERT_FALSE(compare_from_string("\"ABCDEFG\"", "\"abcdefg\"", false));
 }
 
-static void cjson_compare_should_compare_raw(void)
+__attribute__((unused)) static void cjson_compare_should_compare_raw(void)
 {
     cJSON *raw1 = NULL;
     cJSON *raw2 = NULL;
@@ -140,7 +142,7 @@ static void cjson_compare_should_compare_raw(void)
     cJSON_Delete(raw2);
 }
 
-static void cjson_compare_should_compare_arrays(void)
+__attribute__((unused)) static void cjson_compare_should_compare_arrays(void)
 {
     TEST_ASSERT_TRUE(compare_from_string("[]", "[]", true));
     TEST_ASSERT_TRUE(compare_from_string("[]", "[]", false));
@@ -159,7 +161,7 @@ static void cjson_compare_should_compare_arrays(void)
     TEST_ASSERT_FALSE(compare_from_string("[1,2,3]", "[1,2]", false));
 }
 
-static void cjson_compare_should_compare_objects(void)
+__attribute__((unused)) static void cjson_compare_should_compare_objects(void)
 {
     TEST_ASSERT_TRUE(compare_from_string("{}", "{}", true));
     TEST_ASSERT_TRUE(compare_from_string("{}", "{}", false));
@@ -203,10 +205,10 @@ int CJSON_CDECL main(void)
     RUN_TEST(cjson_compare_should_compare_booleans);
     RUN_TEST(cjson_compare_should_compare_null);
     RUN_TEST(cjson_compare_should_not_accept_invalid_types);
-    RUN_TEST(cjson_compare_should_compare_strings);
-    RUN_TEST(cjson_compare_should_compare_raw);
-    RUN_TEST(cjson_compare_should_compare_arrays);
-    RUN_TEST(cjson_compare_should_compare_objects);
+    // RUN_TEST(cjson_compare_should_compare_strings);
+    // RUN_TEST(cjson_compare_should_compare_raw);
+    // RUN_TEST(cjson_compare_should_compare_arrays);
+    // RUN_TEST(cjson_compare_should_compare_objects);
 
     printf("------------------------------\n");
 //    char *pointer = 0;

@@ -94,7 +94,8 @@ then using the CJSON_API_VISIBILITY flag to "export" the same symbols the way CJ
 #define cJSON_String (1 << 4)
 #define cJSON_Array  (1 << 5)
 #define cJSON_Object (1 << 6)
-#define cJSON_Raw    (1 << 7) /* raw json */
+/* raw json译为 原生json串 */
+#define cJSON_Raw    (1 << 7)
 
 #define cJSON_IsReference 256
 #define cJSON_StringIsConst 512
@@ -281,8 +282,11 @@ CJSON_PUBLIC(double) cJSON_SetNumberHelper(cJSON *object, double number);
 /* Change the valuestring of a cJSON_String object, only takes effect when type of object is cJSON_String */
 CJSON_PUBLIC(char*) cJSON_SetValuestring(cJSON *object, const char *valuestring);
 
-/* Macro for iterating over an array or object */
-#define cJSON_ArrayForEach(element, array) for(element = (array != NULL) ? (array)->child : NULL; element != NULL; element = element->next)
+/* Macro for iterating over an array or object */   // 注意宏换行
+#define cJSON_ArrayForEach(element, array) for(\
+element = (array != NULL) ? (array)->child : NULL; \
+element != NULL; \
+element = element->next)
 
 /* malloc/free objects using the malloc/free functions that have been set with cJSON_InitHooks */
 CJSON_PUBLIC(void *) cJSON_malloc(size_t size);
