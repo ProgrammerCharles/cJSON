@@ -31,6 +31,7 @@
 
 static void cjson_array_foreach_should_loop_over_arrays(void)
 {
+    // 一个数组里的子项包含elements数组
     cJSON array[1];
     // 双向链表
     cJSON elements[10];
@@ -81,6 +82,9 @@ static void cjson_get_object_item_should_get_object_items(void)
 
     found = cJSON_GetObjectItem(item, "one");
     TEST_ASSERT_NOT_NULL_MESSAGE(found, "Failed to find first item.");
+    //todo 为什么parse为double类型  done
+    int valu1e= found->valueint;
+    printf("intvalue is %d\n", valu1e);
     TEST_ASSERT_EQUAL_DOUBLE(found->valuedouble, 1);
 
     found = cJSON_GetObjectItem(item, "tWo");
@@ -152,12 +156,18 @@ static void cjson_get_object_item_case_sensitive_should_not_crash_with_array(voi
 
 static void typecheck_functions_should_check_type(void)
 {
+    //todo 假设都为int整型时，做位运算。C中数值字面量占用几个字节
     cJSON invalid[1];
     cJSON item[1];
     invalid->type = cJSON_Invalid;
     invalid->type |= cJSON_StringIsConst;
+
+    printf("invalid->type: %d\n", invalid->type);
     item->type = cJSON_False;
     item->type |= cJSON_StringIsConst;
+
+    int _type = (invalid->type & 0xff);
+    printf("invalid->type & 0xff: %d\n", _type);
 
     TEST_ASSERT_FALSE(cJSON_IsInvalid(NULL));
     TEST_ASSERT_FALSE(cJSON_IsInvalid(item));
@@ -224,7 +234,7 @@ static void cjson_set_number_value_should_set_numbers(void)
 {
     cJSON number[1] = {{NULL, NULL, NULL, cJSON_Number, NULL, 0, 0, NULL}};
 
-    cJSON_SetNumberValue(number, 1.5);
+    cJSON_SetNumberValue(number, 1.5);// 强转类型了
     TEST_ASSERT_EQUAL(1, number->valueint);
     TEST_ASSERT_EQUAL_DOUBLE(1.5, number->valuedouble);
 
@@ -248,6 +258,9 @@ static void cjson_detach_item_via_pointer_should_detach_items(void)
 
     memset(list, '\0', sizeof(list));
 
+    // parent |
+    //       \|/
+    // [3] <- [0] <-> [1] <-> [2] <-> [3]
     /* link the list */
     list[0].next = &(list[1]);
     list[1].next = &(list[2]);
@@ -526,6 +539,7 @@ static void cjson_create_object_reference_should_create_an_object_reference(void
     TEST_ASSERT_TRUE(number_reference->child == number);
     TEST_ASSERT_EQUAL_INT(cJSON_Object | cJSON_IsReference, number_reference->type);
 
+    //todo 为什么没有 cJSON_Delete(number)
     cJSON_Delete(number_object);
     cJSON_Delete(number_reference);
 }
@@ -584,13 +598,15 @@ static void cjson_add_item_to_object_should_not_use_after_free_when_string_is_al
 
 static void cjson_delete_item_from_array_should_not_broken_list_structure(void)
 {
-    const char expected_json1[] = "{\"rd\":[{\"a\":\"123\"}]}";
+    //object {rd : array}
+    const char expected_json1[] = "{\"rd\":[{\"a\":\"123\"}]}"; //object 其中rd属性为数组
     const char expected_json2[] = "{\"rd\":[{\"a\":\"123\"},{\"b\":\"456\"}]}";
     const char expected_json3[] = "{\"rd\":[{\"b\":\"456\"}]}";
     char *str1 = NULL;
     char *str2 = NULL;
     char *str3 = NULL;
 
+    //empty object
     cJSON *root = cJSON_Parse("{}");
 
     cJSON *array = cJSON_AddArrayToObject(root, "rd");
@@ -655,31 +671,42 @@ int CJSON_CDECL main(void)
 {
     UNITY_BEGIN();
 
-    RUN_TEST(cjson_array_foreach_should_loop_over_arrays);
-    RUN_TEST(cjson_array_foreach_should_not_dereference_null_pointer);
-    RUN_TEST(cjson_get_object_item_should_get_object_items);
-    RUN_TEST(cjson_get_object_item_case_sensitive_should_get_object_items);
-    RUN_TEST(cjson_get_object_item_should_not_crash_with_array);
+
+
     RUN_TEST(cjson_get_object_item_case_sensitive_should_not_crash_with_array);
     RUN_TEST(typecheck_functions_should_check_type);
     RUN_TEST(cjson_should_not_parse_to_deeply_nested_jsons);
     RUN_TEST(cjson_set_number_value_should_set_numbers);
     RUN_TEST(cjson_detach_item_via_pointer_should_detach_items);
     RUN_TEST(cjson_replace_item_via_pointer_should_replace_items);
-    RUN_TEST(cjson_replace_item_in_object_should_preserve_name);
-    RUN_TEST(cjson_functions_should_not_crash_with_null_pointers);
-    RUN_TEST(ensure_should_fail_on_failed_realloc);
-    RUN_TEST(skip_utf8_bom_should_skip_bom);
-    RUN_TEST(skip_utf8_bom_should_not_skip_bom_if_not_at_beginning);
     RUN_TEST(cjson_get_string_value_should_get_a_string);
     RUN_TEST(cjson_get_number_value_should_get_a_number);
     RUN_TEST(cjson_create_string_reference_should_create_a_string_reference);
-    RUN_TEST(cjson_create_object_reference_should_create_an_object_reference);
+    RUN_TEST(ensure_should_fail_on_failed_realloc);
+
+    //todo 基本覆盖cJSON所有方法的NULL检测
+    RUN_TEST(cjson_functions_should_not_crash_with_null_pointers);
+
+    RUN_TEST(skip_utf8_bom_should_skip_bom);
+    RUN_TEST(skip_utf8_bom_should_not_skip_bom_if_not_at_beginning);
+
+    //array test
+    RUN_TEST(cjson_array_foreach_should_loop_over_arrays);
+    RUN_TEST(cjson_array_foreach_should_not_dereference_null_pointer);
     RUN_TEST(cjson_create_array_reference_should_create_an_array_reference);
+
+    RUN_TEST(cjson_delete_item_from_array_should_not_broken_list_structure);
+
+    //object test
+    RUN_TEST(cjson_get_object_item_should_get_object_items);
+    RUN_TEST(cjson_get_object_item_case_sensitive_should_get_object_items);
+    RUN_TEST(cjson_get_object_item_should_not_crash_with_array);
+
+    RUN_TEST(cjson_create_object_reference_should_create_an_object_reference);
+    RUN_TEST(cjson_set_valuestring_to_object_should_not_leak_memory);
+    RUN_TEST(cjson_replace_item_in_object_should_preserve_name);
     RUN_TEST(cjson_add_item_to_object_or_array_should_not_add_itself);
     RUN_TEST(cjson_add_item_to_object_should_not_use_after_free_when_string_is_aliased);
-    RUN_TEST(cjson_delete_item_from_array_should_not_broken_list_structure);
-    RUN_TEST(cjson_set_valuestring_to_object_should_not_leak_memory);
 
     return UNITY_END();
 }

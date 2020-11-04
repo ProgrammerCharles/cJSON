@@ -79,7 +79,7 @@ __attribute__((unused)) static void cjson_minify_should_remove_multiline_comment
     TEST_ASSERT_NOT_NULL(minified);
     strcpy(minified, to_minify);
 
-    cJSON_Minify(minified);
+    cJSON_Minify(minified);// minified = {}
     TEST_ASSERT_EQUAL_STRING("{}", minified);
 
     free(minified);
@@ -100,7 +100,7 @@ __attribute__((unused)) static void cjson_minify_should_not_modify_strings(void)
 }
 
 /** minify效果 去除：\n comment 缩进 */
-static void cjson_minify_should_minify_json(void) {
+__attribute__((unused)) static void cjson_minify_should_minify_json(void) {
     const char to_minify[] =
             "{\n"
             "    \"glossary\": { // comment\n"
@@ -156,10 +156,14 @@ static void cjson_minify_should_minify_json(void) {
     free(buffer);
 }
 
-__attribute__((unused)) static void cjson_minify_should_not_loop_infinitely(void) {
+static void cjson_minify_should_not_loop_infinitely(void) {
+
+    // todo 为什么这组数据测试 loop infinitely
     char string[] = { '8', ' ', '/', ' ', '5', '\n', '\0' };
     /* this should not be an infinite loop */
     cJSON_Minify(string);
+
+    printf("string is %s\n", string);
 }
 
 int CJSON_CDECL main(void)
@@ -167,12 +171,12 @@ int CJSON_CDECL main(void)
     UNITY_BEGIN();
 
     // RUN_TEST(cjson_minify_should_not_overflow_buffer);
-    RUN_TEST(cjson_minify_should_minify_json);
+//    RUN_TEST(cjson_minify_should_minify_json);
     // RUN_TEST(cjson_minify_should_remove_single_line_comments);
-    // RUN_TEST(cjson_minify_should_remove_multiline_comments);
+//     RUN_TEST(cjson_minify_should_remove_multiline_comments);
     // RUN_TEST(cjson_minify_should_remove_spaces);
-    // RUN_TEST(cjson_minify_should_not_modify_strings);
-    // RUN_TEST(cjson_minify_should_not_loop_infinitely);
+//     RUN_TEST(cjson_minify_should_not_modify_strings);
+     RUN_TEST(cjson_minify_should_not_loop_infinitely);
 
     return UNITY_END();
 }

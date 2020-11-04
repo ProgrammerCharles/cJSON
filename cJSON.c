@@ -200,6 +200,7 @@ static unsigned char* cJSON_strdup(const unsigned char* string, const internal_h
     {
         return NULL;
     }
+    //todo memcpy 和 strcpy 区别
     memcpy(copy, string, length);
 
     return copy;
@@ -438,8 +439,15 @@ typedef struct
 } printbuffer;
 
 /* realloc printbuffer if necessary to have at least "needed" bytes more */
-static unsigned char* ensure(printbuffer * const p, size_t needed)
+/**
+ *
+ * @param p
+ * @param needed 必须为可能的分配准备充足的空间
+ * @return
+ */
+static unsigned char* ensure(printbuffer * const p, size_t needed)// 200
 {
+    //printbuffer->buffer->length = 100, needed = 200, length = 10, offset = 0
     unsigned char *newbuffer = NULL;
     size_t newsize = 0;
 
@@ -448,7 +456,7 @@ static unsigned char* ensure(printbuffer * const p, size_t needed)
         return NULL;
     }
 
-    if ((p->length > 0) && (p->offset >= p->length))
+    if ((p->length > 0) && (p->offset >= p->length))// 已到print_buffer->buffer末端
     {
         /* make sure that offset is valid */
         return NULL;
@@ -463,7 +471,7 @@ static unsigned char* ensure(printbuffer * const p, size_t needed)
     needed += p->offset + 1;
     if (needed <= p->length)
     {
-        //todo 理解不了  (char * + size_t)
+        //todo done 理解不了  (char * + size_t) A:就是数组常规操作，见书
         return p->buffer + p->offset;
     }
 
@@ -486,7 +494,7 @@ static unsigned char* ensure(printbuffer * const p, size_t needed)
     }
     else
     {
-        // needed * 2
+        // needed * 2  //扩容
         newsize = needed * 2;
     }
 
@@ -794,7 +802,7 @@ static cJSON_bool parse_string(cJSON * const item, parse_buffer * const input_bu
 
 //        size_t ret1 = (size_t) (input_end - input_buffer->content);
 //        printf("%lu minus %lu, equals %lu\n", (size_t)input_end, (size_t)input_buffer->content, ret1);
-        //todo 疑问 input_end这样的字符指针强转为size_t类型的值，该值表示什么？
+        //todo 疑问 input_end这样的字符指针强转为size_t类型的值，该值表示什么？  A:地址做运算
         while (((size_t)(input_end - input_buffer->content) < input_buffer->length) && (*input_end != '\"'))
         {
             /* is escape sequence 转义字符串 */
@@ -1201,6 +1209,7 @@ static unsigned char *print(const cJSON * const item, cJSON_bool format, const i
     printbuffer buffer[1];
     unsigned char *printed = NULL;
 
+    //内存初始化
     memset(buffer, 0, sizeof(buffer));
 
     /* create buffer */
@@ -1370,6 +1379,8 @@ static cJSON_bool parse_value(cJSON * const item, parse_buffer * const input_buf
     {
         return parse_array(item, input_buffer);
     }
+
+//    "{\"one\":1, \"Two\":2, \"tHree\":3}"
     /* object */ // '{'
     if (can_access_at_index(input_buffer, 0) && (buffer_at_offset(input_buffer)[0] == '{'))
     {
@@ -1614,7 +1625,7 @@ static cJSON_bool print_array(const cJSON * const item, printbuffer * const outp
     return true;
 }
 
-/* Build an object from the text. */
+/* Build an object from the text. */ // NOTE 指向常量的指针
 static cJSON_bool parse_object(cJSON * const item, parse_buffer * const input_buffer)
 {
     cJSON *head = NULL; /* linked list head */
@@ -1624,6 +1635,8 @@ static cJSON_bool parse_object(cJSON * const item, parse_buffer * const input_bu
     {
         return false; /* to deeply nested */
     }
+
+    //object嵌套深度+1
     input_buffer->depth++;
 
     if (cannot_access_at_index(input_buffer, 0) || (buffer_at_offset(input_buffer)[0] != '{'))
@@ -1631,6 +1644,7 @@ static cJSON_bool parse_object(cJSON * const item, parse_buffer * const input_bu
         goto fail; /* not an object */
     }
 
+    //{}
     input_buffer->offset++;
     buffer_skip_whitespace(input_buffer);
     if (can_access_at_index(input_buffer, 0) && (buffer_at_offset(input_buffer)[0] == '}'))
@@ -1645,11 +1659,13 @@ static cJSON_bool parse_object(cJSON * const item, parse_buffer * const input_bu
         goto fail;
     }
 
+    // "{\"one\":1, \"Two\":2, \"tHree\":3}"
     /* step back to character in front of the first element */
     input_buffer->offset--;
     /* loop through the comma separated array elements */
     do
     {
+        /* do while每循环一次，解析一下key:value */
         /* allocate next item */
         cJSON *new_item = cJSON_New_Item(&(input_buffer->hooks));
         if (new_item == NULL)
@@ -2034,6 +2050,7 @@ CJSON_PUBLIC(cJSON_bool) cJSON_AddItemToArray(cJSON *array, cJSON *item)
 #pragma GCC diagnostic ignored "-Wcast-qual"
 #endif
 /* helper function to cast away const */
+// 去除const关键词
 static void* cast_away_const(const void* string)
 {
     return (void*)string;
@@ -2043,7 +2060,8 @@ static void* cast_away_const(const void* string)
 #endif
 
 
-static cJSON_bool add_item_to_object(cJSON * const object, const char * const string, cJSON * const item, const internal_hooks * const hooks, const cJSON_bool constant_key)
+static cJSON_bool add_item_to_object(cJSON * const object, const char * const string, cJSON * const item,
+        const internal_hooks * const hooks, const cJSON_bool constant_key)
 {
     char *new_key = NULL;
     int new_type = cJSON_Invalid;
@@ -2053,6 +2071,7 @@ static cJSON_bool add_item_to_object(cJSON * const object, const char * const st
         return false;
     }
 
+    //false
     if (constant_key)
     {
         new_key = (char*)cast_away_const(string);
@@ -2061,6 +2080,7 @@ static cJSON_bool add_item_to_object(cJSON * const object, const char * const st
     else
     {
         //一个指向 只读变量 的指针  string means a pointer to  const unsigned char
+        //todo 为甚么要调memcpy
         new_key = (char*)cJSON_strdup((const unsigned char*)string, hooks);
         if (new_key == NULL)
         {
@@ -2213,6 +2233,7 @@ CJSON_PUBLIC(cJSON*) cJSON_AddObjectToObject(cJSON * const object, const char * 
 
 CJSON_PUBLIC(cJSON*) cJSON_AddArrayToObject(cJSON * const object, const char * const name)
 {
+    //新建数组
     cJSON *array = cJSON_CreateArray();
     if (add_item_to_object(object, name, array, &global_hooks, false))
     {
@@ -2223,12 +2244,21 @@ CJSON_PUBLIC(cJSON*) cJSON_AddArrayToObject(cJSON * const object, const char * c
     return NULL;
 }
 
+/**
+ * 删除属性
+ * @param parent
+ * @param item
+ * @return
+ */
 CJSON_PUBLIC(cJSON *) cJSON_DetachItemViaPointer(cJSON *parent, cJSON * const item)
 {
     if ((parent == NULL) || (item == NULL))
     {
         return NULL;
     }
+
+    // 是否为链表特性
+    //分四种情况 第一个item 最后一个item  非第一个item 非最后一个item
 
     if (item != parent->child)
     {
@@ -2512,6 +2542,7 @@ CJSON_PUBLIC(cJSON *) cJSON_CreateStringReference(const char *string)
     if (item != NULL)
     {
         item->type = cJSON_String | cJSON_IsReference;
+        //指针强转 const char * -> const void* -> void* -> char*
         item->valuestring = (char*)cast_away_const(string);
     }
 
@@ -2821,6 +2852,7 @@ static void skip_oneline_comment(char **input)
 /**
  * 处理多行注释
  */
+//"{/* this is\n a /* multi\n //line \n {comment \"\\\" */}"
 static void skip_multiline_comment(char **input)
 {
     *input += static_strlen("/*");
@@ -2835,6 +2867,8 @@ static void skip_multiline_comment(char **input)
     }
 }
 
+
+
 static void minify_string(char **input, char **output) {
     (*output)[0] = (*input)[0];
     *input += static_strlen("\"");
@@ -2844,7 +2878,7 @@ static void minify_string(char **input, char **output) {
     for (; (*input)[0] != '\0'; (void)++(*input), ++(*output)) {
         (*output)[0] = (*input)[0];
 
-        if ((*input)[0] == '\"') {
+        if ((*input)[0] == '\"') {//结束
             (*output)[0] = '\"';
             *input += static_strlen("\"");
             *output += static_strlen("\"");
@@ -2889,6 +2923,7 @@ CJSON_PUBLIC(void) cJSON_Minify(char *json)
                 {
                     //多行注释
                     skip_multiline_comment(&json);
+                    printf("json left %s\n", json);// }
                 } else {
                     // char* ++操作
                     json++;
@@ -2900,7 +2935,7 @@ CJSON_PUBLIC(void) cJSON_Minify(char *json)
                 break;
 
             default:
-                into[0] = json[0];
+                into[0] = json[0];//todo  KEY --->
                 json++;
                 into++;
         }

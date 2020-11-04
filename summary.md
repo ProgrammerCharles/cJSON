@@ -20,6 +20,9 @@
 4. char '\0' === int 0
 5. 调了allocate 就要调free
 6. '\0'为ASCII码表第一个表项，为空字符串NUL
+7. \"\\\"
+8. goto关键词
+9. 数值字面值占几个字节 int 4个？
 
 
     关于二次指针的理解
@@ -128,8 +131,7 @@ cJSON_Duplicate
 cJson_Utils
 - decode_patch_operation
 
-CJSON
------------------------------------------
+
 方法
 - cJSON_GetObjectItemCaseSensitive
     - get_object_item
@@ -142,7 +144,12 @@ CJSON
 - cJSON_Minify
     - skip_oneline_comment
     - skip_multiline_comment
+    - minify_string
     
+其中，minify_tests值得重新看一次
+
+- cJSON_ReplaceItemViaPointer
+- cJSON_DetachItemViaPointer
     
 #### 对象
 
