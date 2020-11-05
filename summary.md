@@ -23,6 +23,8 @@
 7. \"\\\"
 8. goto关键词
 9. 数值字面值占几个字节 int 4个？
+10.NOTE 学习一下单元测试，测试包含了什么内容
+
 
 
     关于二次指针的理解
@@ -150,6 +152,10 @@ cJson_Utils
 
 - cJSON_ReplaceItemViaPointer
 - cJSON_DetachItemViaPointer
+
+misc_tests
+- cJSON_AddArrayToObject
+- cJSON_Delete
     
 #### 对象
 

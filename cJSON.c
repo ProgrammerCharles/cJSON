@@ -249,14 +249,17 @@ static cJSON *cJSON_New_Item(const internal_hooks * const hooks)
     return node;
 }
 
-/* Delete a cJSON structure. */
+/* Delete a cJSON structure. 递归 */
 CJSON_PUBLIC(void) cJSON_Delete(cJSON *item)
 {
     cJSON *next = NULL;
     while (item != NULL)
     {
         next = item->next;
-        // item->child != null 表示 An array or object item will have a child pointer 
+        // item->child != null 表示 An array or object item will have a child pointer
+        // todo !(item->type & cJSON_IsReference) 怎么理解 为什么这样处理
+        //  A: 非引用类型  可以熟悉一下cJSON_IsReference，cJSON_IsReference的结构都比较简单，
+        //     不像Object(包含属性) Array(包含子项)
         if (!(item->type & cJSON_IsReference) && (item->child != NULL))
         {
             cJSON_Delete(item->child);
@@ -271,6 +274,8 @@ CJSON_PUBLIC(void) cJSON_Delete(cJSON *item)
         {
             global_hooks.deallocate(item->string);
         }
+
+        //引用类型直接 free
         global_hooks.deallocate(item);
         item = next;
     }
@@ -1994,7 +1999,13 @@ static cJSON *create_reference(const cJSON *item, const internal_hooks * const h
     reference->next = reference->prev = NULL;
     return reference;
 }
-
+/**
+ *                                           |---|
+ * 结构   array -> child -> prev -> item3     -item1 <-> item2 <--> item3
+ * @param array
+ * @param item
+ * @return
+ */
 static cJSON_bool add_item_to_array(cJSON *array, cJSON *item)
 {
     cJSON *child = NULL;
@@ -2017,7 +2028,7 @@ static cJSON_bool add_item_to_array(cJSON *array, cJSON *item)
     }
     else
     {
-        /* 数组非空 */
+        /* child->prev 始终指向child链表中最后一个item */
         if (child->prev)
         {
             suffix_object(child->prev, item);
@@ -2499,7 +2510,7 @@ CJSON_PUBLIC(cJSON *) cJSON_CreateNumber(double num)
         item->type = cJSON_Number;
         item->valuedouble = num;
 
-        /* use saturation in case of overflow */
+        /* use saturation in case of overflow  考虑越界问题*/
         if (num >= INT_MAX)
         {
             item->valueint = INT_MAX;

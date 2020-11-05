@@ -535,11 +535,12 @@ static void cjson_create_object_reference_should_create_an_object_reference(void
     TEST_ASSERT_TRUE(cJSON_IsObject(number_object));
     cJSON_AddItemToObjectCS(number_object, key, number);
 
+    // ObjectReference的 child 赋值
     number_reference = cJSON_CreateObjectReference(number);
     TEST_ASSERT_TRUE(number_reference->child == number);
     TEST_ASSERT_EQUAL_INT(cJSON_Object | cJSON_IsReference, number_reference->type);
 
-    //todo 为什么没有 cJSON_Delete(number)
+    //todo 为什么没有 cJSON_Delete(number)  A: 有的，cJSON_Delete方法中递归
     cJSON_Delete(number_object);
     cJSON_Delete(number_reference);
 }
@@ -670,9 +671,7 @@ static void cjson_set_valuestring_to_object_should_not_leak_memory(void)
 int CJSON_CDECL main(void)
 {
     UNITY_BEGIN();
-
-
-
+    //
     RUN_TEST(cjson_get_object_item_case_sensitive_should_not_crash_with_array);
     RUN_TEST(typecheck_functions_should_check_type);
     RUN_TEST(cjson_should_not_parse_to_deeply_nested_jsons);
@@ -694,15 +693,15 @@ int CJSON_CDECL main(void)
     RUN_TEST(cjson_array_foreach_should_loop_over_arrays);
     RUN_TEST(cjson_array_foreach_should_not_dereference_null_pointer);
     RUN_TEST(cjson_create_array_reference_should_create_an_array_reference);
-
     RUN_TEST(cjson_delete_item_from_array_should_not_broken_list_structure);
 
     //object test
     RUN_TEST(cjson_get_object_item_should_get_object_items);
     RUN_TEST(cjson_get_object_item_case_sensitive_should_get_object_items);
     RUN_TEST(cjson_get_object_item_should_not_crash_with_array);
-
     RUN_TEST(cjson_create_object_reference_should_create_an_object_reference);
+
+    //给object设置valuestring为什么会发生memory leak
     RUN_TEST(cjson_set_valuestring_to_object_should_not_leak_memory);
     RUN_TEST(cjson_replace_item_in_object_should_preserve_name);
     RUN_TEST(cjson_add_item_to_object_or_array_should_not_add_itself);
